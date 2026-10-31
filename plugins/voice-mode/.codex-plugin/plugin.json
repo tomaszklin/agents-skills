@@ -1,0 +1,19 @@
+{
+  "name": "voice-mode",
+  "version": "1.1.0",
+  "description": "Short, spoken-style replies when you write to your coding agent from your phone.",
+  "author": {
+    "name": "Tomasz Klin"
+  },
+  "repository": "https://github.com/tomaszklin/agents-skills",
+  "license": "MIT",
+  "keywords": ["voice", "speech", "phone", "mobile"],
+  "skills": "./skills/",
+  "hooks": "./hooks/codex.json",
+  "interface": {
+    "displayName": "Voice mode",
+    "shortDescription": "Short spoken replies from your phone",
+    "developerName": "Tomasz Klin",
+    "category": "Productivity"
+  }
+}

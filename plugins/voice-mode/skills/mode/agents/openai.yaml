@@ -1,0 +1,6 @@
+interface:
+  display_name: "Voice mode"
+  short_description: "Short spoken replies when you write from your phone"
+
+policy:
+  allow_implicit_invocation: false

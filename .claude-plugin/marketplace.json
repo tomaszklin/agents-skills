@@ -10,7 +10,7 @@
     {
       "name": "voice-mode",
       "source": "./plugins/voice-mode",
-      "description": "Short, spoken-style replies when you write to Claude Code from your phone."
+      "description": "Short, spoken-style replies when you write to your coding agent from your phone."
     }
   ]
 }

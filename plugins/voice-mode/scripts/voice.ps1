@@ -1,17 +1,16 @@
-# Voice mode for Claude Code: spoken-style replies when you write from your phone.
+# Voice mode for coding agents: spoken-style replies when you write from your phone.
 #
-# Called by Claude Code hooks (event JSON on stdin):
-#   voice.ps1 prompt   UserPromptSubmit - marks the turn as remote and adds the speech rules for Claude
+# Called by Claude Code and Codex hooks (event JSON on stdin):
+#   voice.ps1 prompt   UserPromptSubmit - marks the turn as remote and adds the speech rules for the agent
 #   voice.ps1 stop     Stop             - sends the reply to the phone through ntfy (if a topic is set)
-#   voice.ps1 notify   Notification     - says that Claude is waiting for approval
+#   voice.ps1 notify   Notification (Claude Code) or PermissionRequest (Codex) - says the agent waits for approval
 # Called by voice-mode.ps1:
 #   voice.ps1 test     sends a test message whatever the mode
 #
 # A turn is "remote" when the prompt arrives while the computer is idle: typing at the keyboard
 # resets the system idle timer, and a prompt sent from a phone does not.
 param(
-    [Parameter(Mandatory)][ValidateSet('prompt', 'stop', 'notify', 'test')][string]$Event,
-    [string]$DataDir = $env:CLAUDE_PLUGIN_DATA
+    [Parameter(Mandatory)][ValidateSet('prompt', 'stop', 'notify', 'test')][string]$Event
 )
 
 $ErrorActionPreference = 'Stop'
@@ -20,8 +19,8 @@ $ErrorActionPreference = 'Stop'
 
 . (Join-Path $PSScriptRoot 'config.ps1')
 
-$LogPath = Join-Path $DataDir 'voice.log'
-$StateDir = Join-Path $DataDir 'state'
+$LogPath = Join-Path $VoiceDataDir 'voice.log'
+$StateDir = Join-Path $VoiceDataDir 'state'
 
 function Write-Log([string]$Line) {
     try {
@@ -37,14 +36,14 @@ function Get-IdleSeconds {
         return 0
     }
     if ($IsLinux) {
-        # xprintidle needs X11. Without it no turn counts as remote, so /voice-mode:mode always is the way.
+        # xprintidle needs X11. Without it no turn counts as remote, so the "always" option is the way.
         if (Get-Command xprintidle -ErrorAction SilentlyContinue) { return [double](xprintidle) / 1000 }
         Write-Log 'xprintidle not found, cannot tell if the computer is idle'
         return 0
     }
     if (-not ('VoiceHook.IdleTime' -as [type])) {
-        # Compiling takes about a second, so it happens once and the DLL stays in the data directory.
-        $dll = Join-Path $DataDir 'IdleTime.dll'
+        # Compiling takes about a second, so it happens once and the DLL stays with the settings.
+        $dll = Join-Path $VoiceDataDir 'IdleTime.dll'
         if (-not (Test-Path $dll)) {
             Add-Type -OutputAssembly $dll -TypeDefinition @'
 using System;
@@ -150,7 +149,7 @@ function Send-Ntfy([string]$Title, [string]$Message) {
 
 function Get-ProjectName($Payload) {
     $cwd = [string]$Payload.cwd
-    if ($cwd) { Split-Path $cwd -Leaf } else { 'Claude' }
+    if ($cwd) { Split-Path $cwd -Leaf } else { 'Agent' }
 }
 
 $SpeechRules = @'
@@ -160,16 +159,16 @@ Rules for this reply:
 - Keep it short, ideally up to 5-6 sentences, in spoken language. Put the most important thing first.
 - No tables, code blocks, headings, emoji or file paths. If something like that is needed, save it to files and only say what it covers.
 - Give important links (for example sources and documents from research) normally, as a markdown link with a short label, like [WHO report 2025](url). The synthesizer reads only the label, so do not leave links out because of reading aloud.
-- Do not use the AskUserQuestion tool: nobody will hear its dialog. If you need a decision, ask one specific question at the end of your reply.
+- Do not use question dialogs or tools such as AskUserQuestion: nobody will hear them. If you need a decision, ask one specific question at the end of your reply.
 - The message was dictated, so it may contain speech recognition errors (for example "cloud" instead of "Claude"). Read it charitably, and ask only when it is genuinely ambiguous.
 '@
 
 try {
-    $null = New-Item -ItemType Directory -Force $DataDir
-    $Config = Read-VoiceConfig $DataDir
+    $null = New-Item -ItemType Directory -Force $VoiceDataDir
+    $Config = Read-VoiceConfig
 
     if ($Event -eq 'test') {
-        Send-Ntfy 'Claude: test' $Config.phrases.test
+        Send-Ntfy 'Voice mode' $Config.phrases.test
         Write-Log 'test sent'
         Write-Output 'Test message sent to your phone.'
         exit 0
@@ -204,19 +203,19 @@ try {
             if (-not $text.Trim()) { Write-Log 'empty reply, nothing to send'; exit 0 }
             $speech = ConvertTo-SpeechText $text $Config.maxChars
             $project = Get-ProjectName $Payload
-            Send-Ntfy "Claude: $project" $speech
+            Send-Ntfy $project $speech
             Write-Log "reply sent ($project, $($speech.Length) characters)"
         }
         'notify' {
             if (-not $Config.topic) { exit 0 }
             if (-not (Test-ShouldSpeak $Payload)) { exit 0 }
             $project = Get-ProjectName $Payload
-            Send-Ntfy "Claude: $project" $Config.phrases.approval.Replace('{project}', $project)
+            Send-Ntfy $project $Config.phrases.approval.Replace('{project}', $project)
             Write-Log "approval request sent ($project)"
         }
     }
 } catch {
-    # A hook must never stop Claude, so an error only goes to the log.
+    # A hook must never stop the agent, so an error only goes to the log.
     Write-Log "error: $($_.Exception.Message)"
     if ($Event -eq 'test') { Write-Output "Sending failed: $($_.Exception.Message)" }
 }

@@ -1,0 +1,40 @@
+{
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -Command '& (Join-Path $env:PLUGIN_ROOT \"scripts/voice.ps1\") prompt'",
+            "commandWindows": "pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command \"& (Join-Path $env:PLUGIN_ROOT 'scripts/voice.ps1') prompt\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -Command '& (Join-Path $env:PLUGIN_ROOT \"scripts/voice.ps1\") stop'",
+            "commandWindows": "pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command \"& (Join-Path $env:PLUGIN_ROOT 'scripts/voice.ps1') stop\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "pwsh -NoProfile -NonInteractive -Command '& (Join-Path $env:PLUGIN_ROOT \"scripts/voice.ps1\") notify'",
+            "commandWindows": "pwsh -NoProfile -NonInteractive -ExecutionPolicy Bypass -Command \"& (Join-Path $env:PLUGIN_ROOT 'scripts/voice.ps1') notify\"",
+            "timeout": 15
+          }
+        ]
+      }
+    ]
+  }
+}
