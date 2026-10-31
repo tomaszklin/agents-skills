@@ -1,0 +1,11 @@
+{
+  "name": "voice-mode",
+  "version": "1.0.0",
+  "description": "Short, spoken-style replies when you write to Claude Code from your phone.",
+  "author": {
+    "name": "Tomasz Klin"
+  },
+  "repository": "https://github.com/tomaszklin/agents-skills",
+  "license": "MIT",
+  "keywords": ["voice", "speech", "phone", "mobile"]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "tomaszklin-skills",
+  "owner": {
+    "name": "Tomasz Klin"
+  },
+  "metadata": {
+    "description": "Unrelated skills for coding agents by Tomasz Klin. Install only the ones you want."
+  },
+  "plugins": [
+    {
+      "name": "voice-mode",
+      "source": "./plugins/voice-mode",
+      "description": "Short, spoken-style replies when you write to Claude Code from your phone."
+    }
+  ]
+}
