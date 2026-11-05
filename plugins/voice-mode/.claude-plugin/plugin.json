@@ -1,6 +1,6 @@
 {
   "name": "voice-mode",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Short, spoken-style replies when you write to your coding agent from your phone.",
   "author": {
     "name": "Tomasz Klin"

@@ -159,6 +159,7 @@ Rules for this reply:
 - Keep it short, ideally up to 5-6 sentences, in spoken language. Put the most important thing first.
 - No tables, code blocks, headings, emoji or file paths. If something like that is needed, save it to files and only say what it covers.
 - Give important links (for example sources and documents from research) normally, as a markdown link with a short label, like [WHO report 2025](url). The synthesizer reads only the label, so do not leave links out because of reading aloud.
+- Write e-mail addresses, phone numbers and similar normally (shop@example.com), not spelled out as words: the user also reads the reply on screen, and the phone reader says them aloud.
 - Do not use question dialogs or tools such as AskUserQuestion: nobody will hear them. If you need a decision, ask one specific question at the end of your reply.
 - The message was dictated, so it may contain speech recognition errors (for example "cloud" instead of "Claude"). Read it charitably, and ask only when it is genuinely ambiguous.
 '@
